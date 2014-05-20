@@ -2,8 +2,9 @@
   (:require [mx.paths.utils :refer [combine]])
   )
 
-; TODO: normalize things (does the adapter do that?)
+; TODO: normalize names (does the adapter do that?)
 
+; TODO: prune the tree (PATH_DELIMITER_KEEP keeps "/")
 (def PATH_DELIMITER_KEEP #"((?<=/)|(?=/))")
 (def PATH_DELIMITER_DISCARD #"/")
 
@@ -35,18 +36,19 @@
             new-branch (create-branch {} path-tokens actions)
             new-tree (combine tree new-branch)]
         (recur (drop 2 r) new-tree))
-      tree))
-  )
+      tree)))
+
+(defn get-node [tree token]
+  (if-let [node (get tree token)]
+    node
+    (get tree (first (filter #(.startsWith % ":") (keys tree)))) ; TODO: clean this a bit
+  ))
 
 (defn find-path [tree tokens]
   (let [t (first tokens)]
     (if (last-token? tokens)
-      ; TODO implement logic to treat :id/:etc elements as wildcards
-      ; if -not-found-, find a key that starts with wildcard element ':''
-      ; and use it. in other frameworks/routing libs, this value is passed as an argument
-      ; to the handler function
-      (get tree t) ; returns the leaf nodes (aka the actions map)
-      (find-path (:subroutes (get tree t)) (rest tokens)))
+      (get-node tree t) ; returns the leaf nodes (aka the actions map)
+      (find-path (:subroutes (get-node tree t)) (rest tokens)))
     ))
 
 (defn route [request routes-tree]
@@ -72,6 +74,5 @@
       ; )
       (if-let [h (route request tree)]
         (apply h [request])
-        ; 404
+        {:status 404 :body "Ooops..."} ; else 404
         ))))
-

@@ -66,10 +66,9 @@
 
 (def req1 {:uri "/" :request-method :get}) ; GET /
 (def req2 {:uri "/user" :request-method :get}) ; GET /user
-(def req3 {:uri "/user/:id/account" :request-method :get}) ; GET /user/5/account
-(def req4 {:uri "/user/:id/account/:id" :request-method :get}) ; GET /user/5/account/1
-(def req5 {:uri "/user/:id/account/:id" :request-method :delete}) ; DELETE /user/5/account/1
-
+(def req3 {:uri "/user/5/account" :request-method :post}) ; GET /user/5/account
+(def req4 {:uri "/user/5/account/1" :request-method :get}) ; GET /user/5/account/1
+(def req5 {:uri "/user/5/account/1" :request-method :delete}) ; DELETE /user/5/account/1
 
 (def r (paths/router routes))
 ; (r req1)
@@ -78,8 +77,10 @@
 ; (r req4)
 ; (r req5)
 
+; (use 'paths.test.core :reload-all)
 
-;(use 'mx.paths.core :reload-all)
-;(def routes-tree (create-tree routes2))
-;(def req {:request-method :get :uri "/user/:id/account/:id"})
-;(paths/route req1 routes-tree)
+
+
+; (use 'mx.paths.core :reload-all)
+; (def routes-tree (create-tree routes2))
+; (route {:request-method :get :uri "/user/:id/account/:id"} routes-tree)
