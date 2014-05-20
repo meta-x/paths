@@ -60,23 +60,22 @@
         (get method))
     ))
 
-(def default-404
+(defn default-404-handler [request]
   {:status 404 :body "Ooops..."})
 
-(defn router [routes-def]
-  "takes a route definition, ''compiles it'' and returns a ring handler function
-  that will route requests to the correct endpoint handler"
-  (let [tree (create-tree routes-def)]
-    (fn [request]
-      (if-let [h (route request tree)]
-        (apply h [request])
-        default-404 ; else (or default-404 (...))
-        ))))
+(defn router
+  "Takes a route definition, ''compiles it'' and returns a ring handler function
+  that will route requests to the correct endpoint handler."
+  ([routes-def] (router routes-def default-404-handler))
+  ([routes-def handler-404]
+    (let [tree (create-tree routes-def)]
+      (fn [request]
+        (if-let [h (route request tree)]
+          (apply h [request])
+          (handler-404 request)
+          )))))
 
 ; TODO:
-; - prune the tree from the delimiter (PATH_DELIMITER_KEEP keeps "/")
-; - 404
-; pass in the router definition
 ; - defhandler/defn x [request]
 ; defhandler macro accepts any number of arguments that will be bound by name from :params
 ; defn takes a single "request" argument
@@ -85,3 +84,4 @@
 ; - how to pass the route parameter to the handler functions?
 ; automatically assoc into :params in "route" function
 ; adding route parameter to :params solves everything - binding will be done by the "dispatch" code
+; - prune the tree from the delimiter (PATH_DELIMITER_KEEP keeps "/")

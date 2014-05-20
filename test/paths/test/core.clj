@@ -70,7 +70,11 @@
 (def req4 {:uri "/user/5/account/1" :request-method :get}) ; GET /user/5/account/1
 (def req5 {:uri "/user/5/account/1" :request-method :delete}) ; DELETE /user/5/account/1
 
-(def r (paths/router routes))
+(defn my-404-handler [request]
+  {:status 418
+   :body "YOU are a teapot :)"})
+(def r (paths/router routes my-404-handler))
+
 ; (r req1)
 ; (r req2)
 ; (r req3)
