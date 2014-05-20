@@ -2,6 +2,8 @@
   (:require [mx.paths.utils :refer [combine]])
   )
 
+; TODO: normalize things (does the adapter do that?)
+
 (def PATH_DELIMITER_KEEP #"((?<=/)|(?=/))")
 (def PATH_DELIMITER_DISCARD #"/")
 
@@ -36,8 +38,6 @@
       tree))
   )
 
-
-
 (defn find-path [tree tokens]
   (let [t (first tokens)]
     (if (last-token? tokens)
@@ -58,8 +58,6 @@
         (get method))
     ))
 
-
-
 (defn router [routes-def]
   "takes a route definition, ''compiles it'' and returns a ring handler function
   that will route requests to the correct endpoint handler"
@@ -72,5 +70,8 @@
       ; (let [handler (route request tree)]
       ;   (handler request)
       ; )
-      (route request tree)
-      )))
+      (if-let [h (route request tree)]
+        (apply h [request])
+        ; 404
+        ))))
+
