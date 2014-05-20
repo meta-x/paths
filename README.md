@@ -20,7 +20,7 @@ Enhanced routing library for Clojure/Ring.
 
 ## Notes
 
-Thought about two ways to define routes.
+Thought about two ways to define routes. Went with \#2.
 
 \#1: A less verbose, data structure based route definition. Less typing for subpaths but also a bit more complicated to read
 

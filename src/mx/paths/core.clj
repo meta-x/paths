@@ -2,14 +2,13 @@
   (:require [mx.paths.utils :refer [combine]])
   )
 
-; TODO: normalize names (does the adapter do that?)
-
-; TODO: prune the tree (PATH_DELIMITER_KEEP keeps "/")
 (def PATH_DELIMITER_KEEP #"((?<=/)|(?=/))")
 (def PATH_DELIMITER_DISCARD #"/")
 
 (defn tokenize-path [path]
-  (clojure.string/split path PATH_DELIMITER_KEEP))
+  (->
+    (clojure.string/lower-case path)
+    (clojure.string/split PATH_DELIMITER_KEEP)))
 
 (defn- last-token? [tokens]
   (= (count tokens) 1))
@@ -24,6 +23,7 @@
     ))
 
 (defn- get-next-route [[path actions]]
+  "Helper function to destructure the routes definition."
   (if (nil? path)
     nil
     [path actions]))
@@ -60,19 +60,28 @@
         (get method))
     ))
 
+(def default-404
+  {:status 404 :body "Ooops..."})
+
 (defn router [routes-def]
   "takes a route definition, ''compiles it'' and returns a ring handler function
   that will route requests to the correct endpoint handler"
   (let [tree (create-tree routes-def)]
     (fn [request]
-      ; TODO: call the handler function
-      ; if it's a simple defn, pass the request
-      ; if it's a defhandler, unwrap arguments from :params and pass them in the correct order
-      ; e.g. defined by the defhandler macro
-      ; (let [handler (route request tree)]
-      ;   (handler request)
-      ; )
       (if-let [h (route request tree)]
         (apply h [request])
-        {:status 404 :body "Ooops..."} ; else 404
+        default-404 ; else (or default-404 (...))
         ))))
+
+; TODO:
+; - prune the tree from the delimiter (PATH_DELIMITER_KEEP keeps "/")
+; - 404
+; pass in the router definition
+; - defhandler/defn x [request]
+; defhandler macro accepts any number of arguments that will be bound by name from :params
+; defn takes a single "request" argument
+; router middleware must know the "type" of the handler function so it can tell which dispatch to do,
+; i.e. (handler request) or (do (get-handler-param-names handler) (handler (unwrap-params (:params request))))
+; - how to pass the route parameter to the handler functions?
+; automatically assoc into :params in "route" function
+; adding route parameter to :params solves everything - binding will be done by the "dispatch" code
