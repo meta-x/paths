@@ -75,13 +75,37 @@
           (handler-404 request)
           )))))
 
+(defn get-arglist [handler]
+  (->
+    (meta handler)
+    (:arglists)
+    (first)))
+
+(defn destruct-arglist [param-names req-params]
+  "Given a list of `param-names`, return a list with the corresponding values from `req-params`."
+  (map #(get req-params (keyword %1)) param-names))
+
+(defn exec-handler [handler request]
+  (let [param-names (get-arglist handler)
+        req-params (:params request)
+        req-vals (destruct-arglist param-names req-params)]
+    (apply handler req-vals)
+    ))
+
+(defmacro handle [handler request] ; reminder: indirections solve EVERYTHING
+  (exec-handler (resolve handler) request)
+  )
+
+
 ; TODO:
 ; - defhandler/defn x [request]
 ; defhandler macro accepts any number of arguments that will be bound by name from :params
 ; defn takes a single "request" argument
 ; router middleware must know the "type" of the handler function so it can tell which dispatch to do,
 ; i.e. (handler request) or (do (get-handler-param-names handler) (handler (unwrap-params (:params request))))
+;
 ; - how to pass the route parameter to the handler functions?
 ; automatically assoc into :params in "route" function
 ; adding route parameter to :params solves everything - binding will be done by the "dispatch" code
+;
 ; - prune the tree from the delimiter (PATH_DELIMITER_KEEP keeps "/")

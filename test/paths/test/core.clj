@@ -83,8 +83,19 @@
 
 ; (use 'paths.test.core :reload-all)
 
+(defn ^{:my-key 1} my-fn [arg1 arg2 arg3]
+  (println arg1)
+  (println arg2)
+  (println arg3)
+  [arg1 arg2 arg3])
+;(my-fn 1 2 3)
+
+
+
 
 
 ; (use 'mx.paths.core :reload-all)
 ; (def routes-tree (create-tree routes2))
 ; (route {:request-method :get :uri "/user/:id/account/:id"} routes-tree)
+
+
