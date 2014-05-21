@@ -83,19 +83,32 @@
 
 ; (use 'paths.test.core :reload-all)
 
-(defn ^{:my-key 1} my-fn [arg1 arg2 arg3]
+
+(defn my-fn1 [request arg1 arg2 arg3]
   (println arg1)
   (println arg2)
   (println arg3)
-  [arg1 arg2 arg3])
-;(my-fn 1 2 3)
+  )
+;(my-fn1 1 2 3)
 
+(defn my-fn2 [request]
+  (println request)
+  )
 
+; (require '[paths.test.core :as test])
+; (require '[mx.paths.core :as paths])
+; (paths/handle test/my-fn1 {:params {:arg1 1 :arg2 2 :arg3 3}})
 
 
 
 ; (use 'mx.paths.core :reload-all)
 ; (def routes-tree (create-tree routes2))
 ; (route {:request-method :get :uri "/user/:id/account/:id"} routes-tree)
+
+
+(handle my-fn1 {:params {:arg1 1 :arg2 2 :arg3 3}})
+
+
+
 
 

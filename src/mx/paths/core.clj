@@ -86,10 +86,15 @@
   (map #(get req-params (keyword %1)) param-names))
 
 (defn exec-handler [handler request]
-  (let [param-names (get-arglist handler)
-        req-params (:params request)
-        req-vals (destruct-arglist param-names req-params)]
-    (apply handler req-vals)
+  (let [param-names (get-arglist handler)]
+    ; NOTE1: maybe this should validate against some user defined metadata eg ^{:http-request true}
+    ; NOTE2: also, maybe support sending metadata AND params? too much hassle...
+    (if (and (= (count param-names) 1)
+             (some #{(symbol "request")} param-names))
+      (apply handler [request])
+      (let [req-params (:params request)
+            req-vals (destruct-arglist param-names req-params)]
+        (apply handler req-vals)))
     ))
 
 (defmacro handle [handler request] ; reminder: indirections solve EVERYTHING
@@ -98,12 +103,6 @@
 
 
 ; TODO:
-; - defhandler/defn x [request]
-; defhandler macro accepts any number of arguments that will be bound by name from :params
-; defn takes a single "request" argument
-; router middleware must know the "type" of the handler function so it can tell which dispatch to do,
-; i.e. (handler request) or (do (get-handler-param-names handler) (handler (unwrap-params (:params request))))
-;
 ; - how to pass the route parameter to the handler functions?
 ; automatically assoc into :params in "route" function
 ; adding route parameter to :params solves everything - binding will be done by the "dispatch" code
