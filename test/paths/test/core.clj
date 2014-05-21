@@ -57,11 +57,11 @@
 
 (def routes
   [
-    "/" {:get index$get}
-    "/user" {:post user$post}
-    "/user/:id" {:get user$get :delete user$delete :put user$put}
-    "/user/:id/account" {:post account$post}
-    "/user/:id/account/:id" {:get account$get :put account$put :delete account$delete}
+    "/" {:get #'index$get}
+    "/user" {:post #'user$post}
+    "/user/:id" {:get #'user$get :delete #'user$delete :put #'user$put}
+    "/user/:id/account" {:post #'account$post}
+    "/user/:id/account/:id" {:get #'account$get :put #'account$put :delete #'account$delete}
   ])
 
 (def req1 {:uri "/" :request-method :get}) ; GET /
@@ -84,16 +84,16 @@
 ; (use 'paths.test.core :reload-all)
 
 
-(defn my-fn1 [request arg1 arg2 arg3]
-  (println arg1)
-  (println arg2)
-  (println arg3)
-  )
-;(my-fn1 1 2 3)
+; (defn my-fn1 [request arg1 arg2 arg3]
+;   (println arg1)
+;   (println arg2)
+;   (println arg3)
+;   )
+; ;(my-fn1 1 2 3)
 
-(defn my-fn2 [request]
-  (println request)
-  )
+; (defn my-fn2 [request]
+;   (println request)
+;   )
 
 ; (require '[paths.test.core :as test])
 ; (require '[mx.paths.core :as paths])
@@ -106,8 +106,9 @@
 ; (route {:request-method :get :uri "/user/:id/account/:id"} routes-tree)
 
 
-(handle my-fn1 {:params {:arg1 1 :arg2 2 :arg3 3}})
+; (handle my-fn1 {:params {:arg1 1 :arg2 2 :arg3 3}})
 
+; (handle my-fn2 {:headers {:something "here"} :request-method :get})
 
 
 
