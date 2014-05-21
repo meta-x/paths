@@ -54,9 +54,15 @@
     :status 200
     :body "DELETE /user/:id/account/:id"
   })
+(defn woot$get []
+  {
+    :status 200
+    :body "WOOT"
+  })
 
 (def routes
   [
+    "/woot" {:get #'woot$get}
     "/" {:get #'index$get}
     "/user" {:post #'user$post}
     "/user/:id" {:get #'user$get :delete #'user$delete :put #'user$put}
@@ -64,6 +70,8 @@
     "/user/:id/account/:id" {:get #'account$get :put #'account$put :delete #'account$delete}
   ])
 
+
+(def req0 {:uri "/woot" :request-method :get}) ; GET /woot
 (def req1 {:uri "/" :request-method :get}) ; GET /
 (def req2 {:uri "/user" :request-method :get}) ; GET /user
 (def req3 {:uri "/user/5/account" :request-method :post}) ; GET /user/5/account

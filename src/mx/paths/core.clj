@@ -75,16 +75,20 @@
   (map #(get req-params (keyword %1)) param-names))
 
 (defn- handle [handler request]
-  (let [param-names (get-arglist handler)]
+  (let [param-names (get-arglist handler)
+        num-params (count param-names)]
     ; NOTE1: maybe this should validate against some user defined metadata eg ^{:http-request true}
-    ; NOTE2: also, maybe support sending metadata AND params? too much hassle...
-    (if (and (= (count param-names) 1)
-             (some #{(symbol "request")} param-names))
-      (apply handler [request])
-      (let [req-params (:params request)
-            req-vals (destruct-arglist param-names req-params)]
-        (apply handler req-vals)))
-    ))
+    ; NOTE2: also, maybe support sending(?) metadata AND params? or is that too much hassle...
+    (cond
+      (= num-params 0)
+        (handler)
+      (and (= num-params 1) (some #{(symbol "request")} param-names))
+        (apply handler [request])
+      :else
+        (let [req-params (:params request)
+              req-vals (destruct-arglist param-names req-params)]
+          (apply handler req-vals))
+    )))
 
 (defn- default-404-handler [request]
   {:status 404 :body "Ooops..."})
