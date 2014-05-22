@@ -52,24 +52,31 @@
         (recur (drop 2 r) new-tree))
       tree)))
 
+;;; helpers for finding the handler for a given path
+
+(defn- is-wildcard [n]
+  (.startsWith n ":"))
+
 (defn- get-wildcard-node [tree]
   "Helper for tree navigation. Returns the wildcard node or nil."
-  (-> (filter #(.startsWith % ":") (keys tree)))
-      (first))
+  (-> (filter is-wildcard (keys tree))
+      (first)))
 
-(defn- get-node [tree token]
+(defn- get-node [tree token route-params]
   "Helper for tree navigation - understands the wilcard `:` token."
   (if-let [node (get tree token)] ; try to find the token in the current level
-    node ; if found, returns the node; if not found, try to match with a wildcard token
-    (get tree (get-wildcard-node tree))
-  ))
+    (vector node route-params) ; if found, returns the node; if not found, try to match with a wildcard token
+    (if-let [wildcard (get-wildcard-node tree)]
+      (vector (get tree wildcard) (assoc route-params (symbol wildcard) token))
+      [nil route-params])))
 
-(defn- find-path [tree tokens]
+(defn- find-path [tree tokens route-params]
   (let [t (first tokens)]
     (if (last-token? tokens)
-      (get-node tree t) ; returns the leaf nodes (aka the actions map)
-      (find-path (:subroutes (get-node tree t)) (rest tokens)))
-    ))
+      (get-node tree t route-params) ; returns the leaf nodes (aka the actions map)
+      (let [[n rp] (get-node tree t route-params)]
+        (find-path (:subroutes n) (rest tokens) rp))
+    )))
 
 ;;; determine which handler to call
 
@@ -77,9 +84,9 @@
   "Route the request to the correct handler and returns it"
   (let [path (:uri request)
         method (:request-method request)
-        path-tokens (tokenize-path path)]
-    (-> (find-path routes-tree path-tokens)
-        (get method))
+        path-tokens (tokenize-path path)
+        [node route-params] (find-path routes-tree path-tokens {})]
+      (vector (get node method) route-params)
     ))
 
 ;;; determine handler parameters and automatically map them when calling
@@ -124,7 +131,12 @@
   ([routes-def handler-404]
     (let [tree (create-tree routes-def)]
       (fn [request]
-        (if-let [h (route request tree)] ; the handler in the routes definition has to be a var!!
-          (handle h request)
-          (handler-404 request)
-          )))))
+        (let [[h rp] (route request tree)] ; the handler in the routes definition has to be a var!!
+          (if (nil? h)
+            (handler-404 request)
+            (->>
+              (merge (get request :params {}) rp)
+              (assoc request :params)
+              (handle h)
+            )
+          ))))))

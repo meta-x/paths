@@ -67,9 +67,16 @@
     :status 200
     :body "POST /woot"
   })
+(defn echo$get [request]
+  (println request)
+  {
+    :status 200
+    :body "GET /echo"
+  })
 
 (def routes
   [
+    "/echo/:id/stuff" {:get #'echo$get}
     "/woot" {:get #'woot$get :post #'woot$post}
     "/" {:get #'index$get}
     "/user" {:post #'user$post}
@@ -79,6 +86,7 @@
   ])
 
 
+(def req0 {:uri "/echo/5/stuff" :request-method :get}) ; GET /echo
 (def req1 {:uri "/" :request-method :get}) ; GET /
 (def req2 {:uri "/user" :request-method :get}) ; GET /user
 (def req3 {:uri "/user/5/account" :request-method :post}) ; GET /user/5/account
@@ -128,7 +136,6 @@
 ; (handle my-fn1 {:params {:arg1 1 :arg2 2 :arg3 3}})
 
 ; (handle my-fn2 {:headers {:something "here"} :request-method :get})
-
 
 
 
