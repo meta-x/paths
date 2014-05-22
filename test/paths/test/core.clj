@@ -57,12 +57,20 @@
 (defn woot$get []
   {
     :status 200
-    :body "WOOT"
+    :body "GET /woot"
+  })
+(defn woot$post [arg1 arg2 arg3]
+  (println arg1)
+  (println arg2)
+  (println arg3)
+  {
+    :status 200
+    :body "POST /woot"
   })
 
 (def routes
   [
-    "/woot" {:get #'woot$get}
+    "/woot" {:get #'woot$get :post #'woot$post}
     "/" {:get #'index$get}
     "/user" {:post #'user$post}
     "/user/:id" {:get #'user$get :delete #'user$delete :put #'user$put}
@@ -71,12 +79,13 @@
   ])
 
 
-(def req0 {:uri "/woot" :request-method :get}) ; GET /woot
 (def req1 {:uri "/" :request-method :get}) ; GET /
 (def req2 {:uri "/user" :request-method :get}) ; GET /user
 (def req3 {:uri "/user/5/account" :request-method :post}) ; GET /user/5/account
 (def req4 {:uri "/user/5/account/1" :request-method :get}) ; GET /user/5/account/1
 (def req5 {:uri "/user/5/account/1" :request-method :delete}) ; DELETE /user/5/account/1
+(def req6 {:uri "/woot" :request-method :get}) ; GET /woot
+(def req7 {:uri "/woot" :request-method :post :params {:arg1 "arg1" :arg2 "arg2"}}) ; POST /woot
 
 (defn my-404-handler [request]
   {:status 418
@@ -88,6 +97,8 @@
 ; (r req3)
 ; (r req4)
 ; (r req5)
+; (r req6)
+; (r req7)
 
 ; (use 'paths.test.core :reload-all)
 

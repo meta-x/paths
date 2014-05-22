@@ -2,10 +2,20 @@
   (:require [mx.paths.utils :refer [combine]])
   )
 
+; TODO:
+; - how to pass the route parameter to the handler functions?
+; automatically assoc into :params in "route" function
+; adding route parameter to :params solves everything - binding will be done by the "dispatch" code
+;
+; - prune the tree from the delimiter (PATH_DELIMITER_KEEP keeps "/")
+; implement my own tokenizer code? ugh
+
 (def PATH_DELIMITER_KEEP #"((?<=/)|(?=/))")
 (def PATH_DELIMITER_DISCARD #"/")
 
 (defn- tokenize-path [path]
+  "Given /this/is/a/path, returns [/ this / is / a / path].
+  TODO: should actually return [/ this is a path]."
   (->
     (clojure.string/lower-case path)
     (clojure.string/split PATH_DELIMITER_KEEP)))
@@ -14,6 +24,8 @@
   (= (count tokens) 1))
 
 (defn- create-branch [tree tokens actions]
+  "Iterates through `tokens` and creates a tree-like structure attaching `actions`
+  to the leaf node."
   (let [t (first tokens)]
     (let [r-t (get tree t {})]
       (if (last-token? tokens)
@@ -29,6 +41,8 @@
     [path actions]))
 
 (defn- create-tree [routes]
+  "Given a routes definition, returns a routes tree that is used by the routing
+  function to send requests to the correct handler."
   (loop [r routes
          tree {}]
     (if-let [[path actions] (get-next-route r)]
@@ -38,10 +52,16 @@
         (recur (drop 2 r) new-tree))
       tree)))
 
+(defn- get-wildcard-node [tree]
+  "Helper for tree navigation. Returns the wildcard node or nil."
+  (-> (filter #(.startsWith % ":") (keys tree)))
+      (first))
+
 (defn- get-node [tree token]
-  (if-let [node (get tree token)]
-    node
-    (get tree (first (filter #(.startsWith % ":") (keys tree)))) ; TODO: clean this a bit
+  "Helper for tree navigation - understands the wilcard `:` token."
+  (if-let [node (get tree token)] ; try to find the token in the current level
+    node ; if found, returns the node; if not found, try to match with a wildcard token
+    (get tree (get-wildcard-node tree))
   ))
 
 (defn- find-path [tree tokens]
@@ -54,7 +74,7 @@
 ;;; determine which handler to call
 
 (defn- route [request routes-tree]
-  ; route the request to the correct handler and returns it
+  "Route the request to the correct handler and returns it"
   (let [path (:uri request)
         method (:request-method request)
         path-tokens (tokenize-path path)]
@@ -65,6 +85,7 @@
 ;;; determine handler parameters and automatically map them when calling
 
 (defn- get-arglist [handler]
+  "Helper for retrieving the argument list from a function (var)."
   (->
     (meta handler)
     (:arglists)
@@ -75,22 +96,25 @@
   (map #(get req-params (keyword %1)) param-names))
 
 (defn- handle [handler request]
+  "Helper that given a `handler` and a `request`, matches the request :params to the
+  arguments of the handler. Sends nil for the args that do not exist in the request :params."
   (let [param-names (get-arglist handler)
         num-params (count param-names)]
-    ; NOTE1: maybe this should validate against some user defined metadata eg ^{:http-request true}
-    ; NOTE2: also, maybe support sending(?) metadata AND params? or is that too much hassle...
+    ; NOTE1: should this validate against some user defined metadata eg ^{:http-request true}?
+    ; NOTE2: also, maybe support sending(?) metadata AND params? or is that too much hassle...?
     (cond
-      (= num-params 0)
+      (= num-params 0) ; no args handler
         (handler)
-      (and (= num-params 1) (some #{(symbol "request")} param-names))
+      (and (= num-params 1) (some #{(symbol "request")} param-names)) ; handler expects the http request
         (apply handler [request])
-      :else
+      :else ; handler defined a list of arguments
         (let [req-params (:params request)
               req-vals (destruct-arglist param-names req-params)]
           (apply handler req-vals))
     )))
 
 (defn- default-404-handler [request]
+  "The default 404 response."
   {:status 404 :body "Ooops..."})
 
 (defn router
@@ -104,11 +128,3 @@
           (handle h request)
           (handler-404 request)
           )))))
-
-; TODO:
-; - how to pass the route parameter to the handler functions?
-; automatically assoc into :params in "route" function
-; adding route parameter to :params solves everything - binding will be done by the "dispatch" code
-;
-; - prune the tree from the delimiter (PATH_DELIMITER_KEEP keeps "/")
-; implement my own tokenizer code? ugh
