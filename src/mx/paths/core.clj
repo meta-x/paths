@@ -3,7 +3,6 @@
   )
 
 ; TODO:
-;
 ; - prune the tree from the delimiter (PATH_DELIMITER_KEEP keeps "/")
 ; implement my own tokenizer code? ugh
 
@@ -60,6 +59,7 @@
       (first)))
 
 (defn- wc->kw [wc]
+  "Helper that converts a :wildcard into a :keyword."
   (->
     (subs wc 1)
     (keyword)))
