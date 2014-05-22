@@ -3,9 +3,6 @@
   )
 
 ; TODO:
-; - how to pass the route parameter to the handler functions?
-; automatically assoc into :params in "route" function
-; adding route parameter to :params solves everything - binding will be done by the "dispatch" code
 ;
 ; - prune the tree from the delimiter (PATH_DELIMITER_KEEP keeps "/")
 ; implement my own tokenizer code? ugh
@@ -62,12 +59,17 @@
   (-> (filter is-wildcard (keys tree))
       (first)))
 
+(defn- wc->kw [wc]
+  (->
+    (subs wc 1)
+    (keyword)))
+
 (defn- get-node [tree token route-params]
   "Helper for tree navigation - understands the wilcard `:` token."
   (if-let [node (get tree token)] ; try to find the token in the current level
     (vector node route-params) ; if found, returns the node; if not found, try to match with a wildcard token
     (if-let [wildcard (get-wildcard-node tree)]
-      (vector (get tree wildcard) (assoc route-params (symbol wildcard) token))
+      (vector (get tree wildcard) (assoc route-params (wc->kw wildcard) token))
       [nil route-params])))
 
 (defn- find-path [tree tokens route-params]
