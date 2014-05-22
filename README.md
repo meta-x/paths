@@ -92,7 +92,7 @@ Some examples of handler implementations:
 
 
 
-### 3.
+### 3. Setup routing with Ring
 Apply the `router` function to your routes definition.
 
 Ideally you'll use `router` in the ring app definition.
@@ -112,13 +112,13 @@ You should use `router` in your ring app definition (with your desired middlewar
 
 
 
-## TODO
+## TODO / You can help by
 
-- real tests
+- writing real tests
 
 - improve doc
 
-...
+- etc
 
 
 
