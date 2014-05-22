@@ -1,5 +1,5 @@
 (defproject paths "0.1.0-beta1"
-  :description "Enhanced routing library for Clojure/Ring."
+  :description "(Enhanced) routing library for Clojure/Ring."
   :url "https://github.com/meta-x/paths"
   :license {
     :name "The MIT License"

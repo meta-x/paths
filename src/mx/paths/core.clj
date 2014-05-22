@@ -133,7 +133,7 @@
   ([routes-def handler-404]
     (let [tree (create-tree routes-def)]
       (fn [request]
-        (let [[h rp] (route request tree)] ; the handler in the routes definition has to be a var!!
+        (let [[h rp] (route request tree)] ; ATTN: the handler in the routes definition has to be a var!!
           (if (nil? h)
             (handler-404 request)
             (->>

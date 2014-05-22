@@ -8,6 +8,7 @@
 
 (defn index []
   (response "<div>hi</div>
+            <div>you should be running this with an eye on the <a href='https://github.com/meta-x/paths/blob/master/examples/paths_example/src/paths_example/core.clj'>example's source code</a>.</div>
              <a href='/basic'>handler that takes the request object as argument</a><br/>
              <a href='/with/args?p1=1&amp;p2=2'>handler that takes 2 different arguments</a><br/>
              <a href='/with/no/args'>handler that takes no arguments</a><br/>
