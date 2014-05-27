@@ -14,7 +14,7 @@ Please give feedback/suggestions/etc through github issues.
 
 run `lein ring server` in `examples/paths_example`
 
-This will launch a web server and open your browser at (http://localhost:3000)[http://localhost:3000], showing you a series of links that should be self-explanatory.
+This will launch a web server and open your browser at [http://localhost:3000](http://localhost:3000), showing you a series of links that should be self-explanatory.
 
 
 
@@ -33,7 +33,7 @@ to your leiningen `:dependencies`.
 ## Usage
 
 ### 1. Require it
-`paths` expects `ring.middleware.params` and `ring.middleware.keyword-params` to be used as middleware, so be sure to include it. ; TODO: fix this by including these middlewares into path
+`paths` expects `ring.middleware.params` and `ring.middleware.keyword-params` to be used as middleware, so be sure to include it. ; TODO: fix this by including these middlewares into paths
 
 ```clojure
 (:require [mx.paths.core :refer [router]]
@@ -44,17 +44,17 @@ to your leiningen `:dependencies`.
 
 
 ### 2.1 Define your routes
-- Route definition consists of a vector that must have a pair of a string followed by a map, i.e. `("/path" {:get #'handler$get})+` for you BNF junkies
+- Route definition consists of a vector that must have a pair of string followed by a map, i.e. `"/path" {:get #'handler$get}`.
 
-- In the route definition you only state the paths and the handlers for each method (usually :get/:post/:put/:delete)
+- In the route definition you only state the paths and the handlers for each method (usually :get/:post/:put/:delete).
 
-- Since the 2nd element is a map, it should be easy to extend `paths` i.e. you can add (almost) anything to the the map and (TBI) have it passed to your handler or executed by the routing library
+- Since the 2nd element is a map, it should be easy to extend `paths` i.e. you can add (almost) anything to the the map and (TODO) have it passed to your handler or executed by the routing library.
 
-- You **must** pass the handlers in `var` form, i.e. using `#'`
+- You **must** pass the handlers in `var` form, i.e. using `#'`,
 
-- Route definition does not support contextualized routes - they **must be explicitely defined**! Sorry about that
+- Route definition does not support contextualized routes - they **must be explicitely defined**! This means you need to specify the whole path for routes (i.e. you need to use `/user/sign/in`, `/user/sign/up`, `/user/sign/out` - there's no way to do `/user` and then have the sub-routes `/in`, `/up`, `/out` under the `/user` context). Sorry about that.
 
-- For wildcards/route parameters, use the traditional way of defining a path like `/this/path/accepts/:anything/there`. `paths` will put a parameter named `:anything` in the request's `:params` map which you may optionally obtain by declaring it in the handler's argument list
+- For wildcards/route parameters, use the traditional way of defining a path like `/this/path/accepts/:anything/there`. `paths` will put a parameter named `:anything` in the request's `:params` map - which you may optionally obtain by declaring it in the handler's argument list.
 
 Example routes definition:
 ```clojure
@@ -93,11 +93,12 @@ Some examples of handler implementations:
 
 
 ### 3. Setup routing with Ring
-Apply the `router` function to your routes definition.
-
-Ideally you'll use `router` in the ring app definition.
+Finally, you need to apply the `router` function to your routes definition `(router routes-def)` and use it in your ring app definition.
 
 `router` is the function that "compiles" the routes definition to a ring handler function that will route the requests to your defined handler. `router` also takes an optional 404 handler function as its 2nd argument. The 404 function must take one single argument, the http request. If no 404 handler is provided, a default 404 response will be generated.
+
+Here, see if this uncomplicates my explanation (this is how `paths` works):
+![How paths works](/doc/how-paths-works.jpg?raw=true)
 
 You should use `router` in your ring app definition (with your desired middlewares).
 
@@ -118,7 +119,7 @@ You should use `router` in your ring app definition (with your desired middlewar
 
 - improve doc
 
-- etc
+- ask questions, make suggestions, etc
 
 
 
