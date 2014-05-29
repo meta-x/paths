@@ -6,6 +6,9 @@
 ; - prune the tree from the delimiter (PATH_DELIMITER_KEEP keeps "/")
 ; implement my own tokenizer code? ugh
 
+
+(declare create-routes-tree route router-with router-with-tree)
+
 (def PATH_DELIMITER_KEEP #"((?<=/)|(?=/))")
 (def PATH_DELIMITER_DISCARD #"/")
 
@@ -36,10 +39,10 @@
     nil
     [path actions]))
 
-(defn- create-tree [routes]
+(defn create-routes-tree [routes-def] ; public visibility
   "Given a routes definition, returns a routes tree that is used by the routing
   function to send requests to the correct handler."
-  (loop [r routes
+  (loop [r routes-def
          tree {}]
     (if-let [[path actions] (get-next-route r)]
       (let [path-tokens (tokenize-path path)
@@ -82,16 +85,16 @@
 
 ;;; determine which handler to call
 
-(defn- route [request routes-tree]
-  "Route the request to the correct handler and returns it"
+(defn route [request routes-tree] ; public visibility
+  "Route the request to the correct handler and returns it."
   (let [path (:uri request)
         method (:request-method request)
         path-tokens (tokenize-path path)
         [node route-params] (find-path routes-tree path-tokens {})]
-      (vector (get node method) route-params)
+      (vector (get node method) route-params) ; returns [handler route-params]
     ))
 
-;;; determine handler parameters and automatically map them when calling
+;;; determine handler parameters and automagically map them when calling
 
 (defn- get-arglist [handler]
   "Helper for retrieving the argument list from a function (var)."
@@ -126,19 +129,35 @@
   "The default 404 response."
   {:status 404 :body "Ooops..."})
 
-(defn router
+
+(defn- dispatch-request [routes-tree request]
+  (let [[h rp] (route request routes-tree)]
+    (if (nil? h)
+      ; no handler found, 404
+      (handler-404 request)
+      ; handler found, apply handler with args
+      (->>
+        ; TODO: if wrap-route-params is used, this is not needed
+        (merge (get request :params {}) rp) ; merge request params with route params
+        (assoc request :params) ; put it back into the request
+        (handle h) ; call `handle` to execute the handler
+      ))))
+
+;;; router handler
+
+(defn router-with-def
   "Takes a route definition, ''compiles it'' and returns a ring handler function
   that will route requests to the correct endpoint handler."
   ([routes-def] (router routes-def default-404-handler))
   ([routes-def handler-404]
-    (let [tree (create-tree routes-def)]
+    (let [tree (create-routes-tree routes-def)]
       (fn [request]
-        (let [[h rp] (route request tree)] ; ATTN: the handler in the routes definition has to be a var!!
-          (if (nil? h)
-            (handler-404 request)
-            (->>
-              (merge (get request :params {}) rp)
-              (assoc request :params)
-              (handle h)
-            )
-          ))))))
+        (dispatch-request tree request)))))
+
+(defn router-with-tree
+  ([routes-tree]
+    (router2 routes-tree default-404-handler))
+  ([routes-tree handler-404]
+    (fn [request]
+      (dispatch-request routes-tree request))))
+
