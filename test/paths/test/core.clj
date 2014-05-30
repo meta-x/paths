@@ -104,7 +104,7 @@
 (defn my-404-handler [request]
   {:status 418
    :body "YOU are a teapot :)"})
-(def r (paths/router routes my-404-handler))
+(def r (paths/router-with-def routes my-404-handler))
 
 ; (r req1)
 ; (r req2)
