@@ -94,6 +94,10 @@
       (vector (get node method) route-params) ; returns [handler route-params]
     ))
 
+(defn bind-query-routes [routes-tree] ; usage: (def query-routes (paths/bind-query-routes routes-tree))
+  (fn [request]
+    (route request routes-tree)))
+
 ;;; determine handler parameters and automagically map them when calling
 
 (defn- get-arglist [handler]
