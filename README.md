@@ -23,7 +23,7 @@ This will launch a web server and open your browser at [http://localhost:3000](h
 Add
 
 ```clojure
-[paths "0.1.0-beta1"]
+[paths "0.1.0-beta2"]
 ```
 
 to your leiningen `:dependencies`.
@@ -54,7 +54,7 @@ to your leiningen `:dependencies`.
 
 - Route definition does not support contextualized routes - they **must be explicitely defined**! This means you need to specify the whole path for routes (i.e. you need to use `/user/sign/in`, `/user/sign/up`, `/user/sign/out` - there's no way to do `/user` and then have the sub-routes `/in`, `/up`, `/out` under the `/user` context). Sorry about that.
 
-- For wildcards/route parameters, use the traditional way of defining a path like `/this/path/accepts/:anything/there`. `paths` will put a parameter named `:anything` in the request's `:params` map - which you may optionally obtain by declaring it in the handler's argument list.
+- For wildcards and route parameters, use the traditional way of defining a path like `/this/path/accepts/:anything/there`. `paths` will put a parameter named `:anything` in the request's `:params` map - which you may optionally obtain by declaring it in the handler's argument list.
 
 Example routes definition:
 ```clojure
@@ -99,9 +99,9 @@ Finally, you need to apply one of the router functions to your routes definition
 
 `router-with-tree` takes a previously compiled routes tree and returns the dispatcher function that will route the requests. You can create a routes-tree using `create-routes-tree`. These functions, together with `route` allow you to query `paths` to determine what's the handler for a given path.
 
-They also take an optional 404 handler function as its 2nd argument. The 404 function must take one single argument, the http request. If no 404 handler is provided, a default 404 response will be generated.
+They also take an optional 404 handler function as an argument. The 404 function must take one single argument, the http request. If no 404 handler is provided, a default 404 response will be generated.
 
-Here, see if this uncomplicates my explanation (this is how `paths` works):
+Here, see if this decomplicates my explanation (this is how `paths` works):
 ![How paths works](/doc/how-paths-works.jpg?raw=true)
 
 You should use the router functions in your ring app definition (with your desired middlewares).
@@ -110,7 +110,7 @@ There's also a `wrap-route-params` middleware in `mx.paths.middleware` that puts
 ```clojure
 (def app
   (->
-    (router routes)
+    (router-with-def routes)
     (wrap-keyword-params)
     (wrap-params)
     ))
