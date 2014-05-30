@@ -130,7 +130,7 @@
   {:status 404 :body "Ooops..."})
 
 
-(defn- dispatch-request [routes-tree request]
+(defn- dispatch-request [routes-tree request handler-404]
   (let [[h rp] (route request routes-tree)]
     (if (nil? h)
       ; no handler found, 404
@@ -148,16 +148,17 @@
 (defn router-with-def
   "Takes a route definition, ''compiles it'' and returns a ring handler function
   that will route requests to the correct endpoint handler."
-  ([routes-def] (router routes-def default-404-handler))
+  ([routes-def] (router-with-def routes-def default-404-handler))
   ([routes-def handler-404]
     (let [tree (create-routes-tree routes-def)]
       (fn [request]
-        (dispatch-request tree request)))))
+        (dispatch-request tree request handler-404)))))
 
 (defn router-with-tree
   ([routes-tree]
-    (router2 routes-tree default-404-handler))
+    (router-with-tree routes-tree default-404-handler))
   ([routes-tree handler-404]
     (fn [request]
-      (dispatch-request routes-tree request))))
+      (dispatch-request routes-tree request handler-404))))
+
 

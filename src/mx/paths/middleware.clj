@@ -1,10 +1,10 @@
 (ns mx.paths.middleware
   (:require [mx.paths.core :refer [route]]))
 
-
-;;; middleware for route params
+;;; optional middleware for route params
 
 (defn wrap-route-params [handler routes-tree]
+  "Middleware that puts the route parameters into the request's :params map."
   (fn [request]
     (let [[_ route-params] (route request routes-tree)]
       (->>
