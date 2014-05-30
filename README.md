@@ -36,7 +36,7 @@ to your leiningen `:dependencies`.
 `paths` expects `ring.middleware.params` and `ring.middleware.keyword-params` to be used as middleware, so be sure to include it. ; TODO: fix this by including these middlewares into paths
 
 ```clojure
-(:require [mx.paths.core :refer [router]]
+(:require [mx.paths.core :refer [router-with-def]]
           [ring.middleware.params :refer [wrap-params]]
           [ring.middleware.keyword-params :refer [wrap-keyword-params]])
 ```
@@ -93,14 +93,19 @@ Some examples of handler implementations:
 
 
 ### 3. Setup routing with Ring
-Finally, you need to apply the `router` function to your routes definition `(router routes-def)` and use it in your ring app definition.
+Finally, you need to apply one of the router functions to your routes definition - `(router-with-def routes-def)` or `(router-with-tree routes-tree)` - and use it in your ring app definition.
 
-`router` is the function that "compiles" the routes definition to a ring handler function that will route the requests to your defined handler. `router` also takes an optional 404 handler function as its 2nd argument. The 404 function must take one single argument, the http request. If no 404 handler is provided, a default 404 response will be generated.
+`router-with-def` is a function that takes a routes definition and returns a dispatcher function that will route the requests to your defined handler.
+
+`router-with-tree` takes a previously compiled routes tree and returns the dispatcher function that will route the requests. You can create a routes-tree using `create-routes-tree`. These functions, together with `route` allow you to query `paths` to determine what's the handler for a given path.
+
+They also take an optional 404 handler function as its 2nd argument. The 404 function must take one single argument, the http request. If no 404 handler is provided, a default 404 response will be generated.
 
 Here, see if this uncomplicates my explanation (this is how `paths` works):
 ![How paths works](/doc/how-paths-works.jpg?raw=true)
 
-You should use `router` in your ring app definition (with your desired middlewares).
+You should use the router functions in your ring app definition (with your desired middlewares).
+There's also a `wrap-route-params` middleware in `mx.paths.middleware` that puts the route parameters into the request's `:params` map.
 
 ```clojure
 (def app
