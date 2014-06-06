@@ -2,12 +2,16 @@
   (:require [mx.paths.utils :refer [combine]])
   )
 
+(declare
+  create-routes-tree route
+  router-with-def router-with-tree
+  bind-query-routes-def bind-query-routes-tree)
+
 ; TODO:
-; - prune the tree from the delimiter (PATH_DELIMITER_KEEP keeps "/")
-; implement my own tokenizer code? ugh
-
-
-(declare create-routes-tree route router-with router-with-tree)
+; - prune the tree from the delimiter (PATH_DELIMITER_KEEP keeps "/") - implement my own tokenizer code? ugh
+; - doesn't support resources and file download yet!
+; - accept :any "method"
+; - should really implement the feature where I can send the request object with other parameters
 
 (def PATH_DELIMITER_KEEP #"((?<=/)|(?=/))")
 (def PATH_DELIMITER_DISCARD #"/")
@@ -94,9 +98,14 @@
       (vector (get node method) route-params) ; returns [handler route-params]
     ))
 
-(defn bind-query-routes [routes-tree] ; usage: (def query-routes (paths/bind-query-routes routes-tree))
+; TODO: xxx
+(defn bind-query-routes-tree [routes-tree]
   (fn [request]
     (route request routes-tree)))
+
+(defn bind-query-routes-def [routes-def]
+  (fn [request]
+    (route request (create-routes-tree routes-def))))
 
 ;;; determine handler parameters and automagically map them when calling
 
@@ -107,9 +116,13 @@
     (:arglists)
     (first)))
 
+(defn- get-param-name [param]
+  (or (:name (meta param))
+      (keyword param)))
+
 (defn- destruct-arglist [param-names req-params]
   "Given a list of `param-names`, return a list with the corresponding values from `req-params`."
-  (map #(get req-params (keyword %1)) param-names))
+  (map #(get req-params (get-param-name %1)) param-names))
 
 (defn- handle [handler request]
   "Helper that given a `handler` and a `request`, matches the request :params to the

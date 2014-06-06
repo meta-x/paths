@@ -13,7 +13,7 @@
              <a href='/with/args?p1=1&amp;p2=2'>handler that takes 2 different arguments</a><br/>
              <a href='/with/no/args'>handler that takes no arguments</a><br/>
              <a href='/this/accepts/anything/yeah'>wildcard example</a><br/>
-             <a href='/this/is/an/endpoint?param=1'>GET</a><br/>
+             <a href='/this/is/an/endpoint?what=1'>GET</a><br/>
              <span>curl -X POST http://localhost:3000/this/is/an/endpoint?param=2</span><br/>
              <span>curl -X DELETE http://localhost:3000/this/is/an/endpoint?param=3</span><br/>
              <span>curl -X PUT http://localhost:3000/this/is/an/endpoint?param=4</span><br/>
@@ -32,7 +32,7 @@
 (defn handler-wildcard [wildcards]
   (println "--- handler-wildcard")
   (response wildcards))
-(defn handler-get [param]
+(defn handler-get [^{:name :what}param]
   (println "--- handler-get")
   (response (str "you-got-me" "\n" param)))
 (defn handler-post [param]
