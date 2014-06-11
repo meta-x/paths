@@ -3,11 +3,12 @@
 
 ;;; optional middleware for route params
 
-(defn wrap-route-params [handler routes-tree]
+(defn wrap-route-params
   "Middleware that puts the route parameters into the request's :params map."
+  [handler routes-tree]
   (fn [request]
     (let [[_ route-params] (route request routes-tree)]
       (->>
-        (merge (get request :params {}) route-params) ; merge request params with route params
-        (assoc request :params) ; put it back into the request
-      ))))
+        route-params
+        (merge (get request :params {})) ; merge request params with route params
+        (assoc request :params))))) ; put it back into the request

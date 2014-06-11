@@ -22,9 +22,7 @@ This will launch a web server and open your browser at [http://localhost:3000](h
 
 Add
 
-```clojure
-[paths "0.1.0-beta2"]
-```
+[![Current Version](https://clojars.org/paths/latest-version.svg)](https://clojars.org/paths)
 
 to your leiningen `:dependencies`.
 
