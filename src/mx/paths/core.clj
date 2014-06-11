@@ -81,9 +81,9 @@
   "Helper for tree navigation - understands the wilcard `:` token."
   [tree token route-params]
   (if-let [node (get tree token)] ; try to find the token in the current level
-    (vector node route-params) ; if found, returns the node; if not found, try to match with a wildcard token
+    [node route-params] ; if found, returns the node; if not found, try to match with a wildcard token
     (if-let [wildcard (get-wildcard-node tree)]
-      (vector (get tree wildcard) (assoc route-params (wc->kw wildcard) token))
+      [(get tree wildcard) (assoc route-params (wc->kw wildcard) token)]
       [nil route-params])))
 
 (defn- find-path
@@ -103,7 +103,7 @@
         method (:request-method request)
         path-tokens (tokenize-path path)
         [node route-params] (find-path routes-tree path-tokens {})]
-      (vector (get node method) route-params))) ; returns [handler route-params]
+      [(get node method) route-params))] ; returns [handler route-params]
 
 ;;; determine handler parameters and automagically map them when calling
 
