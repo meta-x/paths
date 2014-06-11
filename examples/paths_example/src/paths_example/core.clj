@@ -6,7 +6,8 @@
             [ring.util.response :refer [response]])
   )
 
-(defn index []
+(defn index
+  []
   (response "<div>hi</div>
             <div>you should be running this with an eye on the <a href='https://github.com/meta-x/paths/blob/master/examples/paths_example/src/paths_example/core.clj'>example's source code</a>.</div>
              <a href='/basic'>handler that takes the request object as argument</a><br/>
@@ -18,32 +19,49 @@
              <span>curl -X DELETE http://localhost:3000/this/is/an/endpoint?param=3</span><br/>
              <span>curl -X PUT http://localhost:3000/this/is/an/endpoint?param=4</span><br/>
             "))
-(defn basic-handler [request]
+
+(defn basic-handler
+  [request]
   (println "--- basic-handler")
   (response (str request)))
-(defn handler-with-args [p1 p2]
+
+(defn handler-with-args
+  [p1 p2]
   (println "--- handler-with-args")
   (println p1)
   (println p2)
   (response (str p1 "\n" p2)))
-(defn handler-with-no-args []
+
+(defn handler-with-no-args
+  []
   (println "--- handler-with-no-args")
   (response "no args"))
-(defn handler-wildcard [wildcards]
+
+(defn handler-wildcard
+  [wildcards]
   (println "--- handler-wildcard")
   (response wildcards))
-(defn handler-get [^{:name :what}param]
+
+(defn handler-get
+  [^{:name :what}param]
   (println "--- handler-get")
   (response (str "you-got-me" "\n" param)))
-(defn handler-post [param]
+
+(defn handler-post
+  [param]
   (println "--- handler-post")
   (response (str "you-posted-me" "\n" param)))
-(defn handler-delete [param]
+
+(defn handler-delete
+  [param]
   (println "--- handler-delete")
   (response (str "you-deleted-me" "\n" param)))
-(defn handler-put [param]
+
+(defn handler-put
+  [param]
   (println "--- handler-put")
   (response (str "you-put-me" "\n" param)))
+
 
 
 (def routes [
@@ -53,12 +71,11 @@
   "/with/no/args" {:get #'handler-with-no-args}
   "/this/accepts/:wildcards/yeah" {:get #'handler-wildcard}
   "/this/is/an/endpoint" {:get #'handler-get :delete #'handler-delete :post #'handler-post :put #'handler-put}
-  ])
-
+])
 
 (def app
   (->
-    (router-with-def routes)
+    routes
+    (router-with-def)
     (wrap-keyword-params)
-    (wrap-params)
-    ))
+    (wrap-params)))
