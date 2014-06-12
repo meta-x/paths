@@ -54,9 +54,9 @@ to your leiningen `:dependencies`.
 
 - For **route parameters**, use the traditional way of defining a path like `/this/path/accepts/:anything/there`. `paths` will put a parameter named `:anything` in the request's `:params` map - which you may optionally obtain by declaring it in the handler's argument list.
 
-- For **wildcards**, use the keyword `:*` in your path, i.e. `"/i/accept/anything/:*" {:any #'my-fn}` All requests that get caught by this rule (e.g. `/i/accept/anything/123/456/0000`) will be served the specified handler.
+- For **wildcards**, use the keyword `:*` in your path, i.e. `"/i/accept/anything/:*" {:any #'my-fn}` All requests that get caught by this rule (e.g. `/i/accept/anything/123/456/0000`) will be served by the specified handler.
 
-- For **resource and static file handling**, use a wildcard path definition (not strictly required, but it's the common use case) followed by `paths` `resource-handler` or `file-handler` helpers. E.g. `"/public/:*" resource-handler`, `"/download/:*" file-handler`.
+- For **resource and static file handling**, use a wildcard path definition (not strictly required, but it's the common use case) followed by `paths`'s `resource-handler` or `file-handler` helpers. E.g. `"/public/:*" resource-handler`, `"/download/:*" file-handler`. Resources are expected to be in your project's `/resources` folder. Static files should be placed under `/resources/public`.
 
 Example routes definition:
 ```clojure
