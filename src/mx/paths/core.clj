@@ -12,6 +12,7 @@
 ; - prune the tree from the delimiter (PATH-DELIMITER-KEEP keeps "/") - implement my own tokenizer code? ugh
 ; - should really implement the feature where I can send the request object with other parameters
 ; - check https://github.com/ztellman/automat for faster tokenization
+; - create atom for "request"
 
 (def PATH-DELIMITER-KEEP #"((?<=/)|(?=/))")
 (def PATH-DELIMITER-DISCARD #"/")
@@ -57,15 +58,15 @@
 
 ;;; helpers for finding the handler for a given path
 
-(defn- is-wildcard
+(defn- is-wildcard-or-route-param
   [n]
   (.startsWith n ":"))
 
-(defn- get-wildcard-node
+(defn- get-wc-rp-node
   "Helper for tree navigation. Returns the wildcard node or nil."
   [tree]
   (->
-    is-wildcard
+    is-wildcard-or-route-param
     (filter (keys tree))
     (first)))
 
@@ -78,21 +79,23 @@
     (keyword)))
 
 (defn- get-node
-  "Helper for tree navigation - understands the wilcard `:` token."
+  "Helper for tree navigation - understands the route-param/wilcard `:` token."
   [tree token route-params]
   (if-let [node (get tree token)] ; try to find the token in the current level
-    [node route-params] ; if found, returns the node; if not found, try to match with a wildcard token
-    (if-let [wildcard (get-wildcard-node tree)]
-      [(get tree wildcard) (assoc route-params (wc->kw wildcard) token)]
-      [nil route-params])))
+    [token node route-params] ; if found, returns [tree-token node route-params]
+    (if-let [wc-rp (get-wc-rp-node tree)] ; if not found, try to match with a wildcard/route-param token
+      (let [wc-rp-kw (wc->kw wc-rp)]
+        [wc-rp-kw (get tree wc-rp) (assoc route-params wc-rp-kw token)])
+      [nil nil route-params])))
 
 (defn- find-path
   [tree tokens route-params]
-  (let [t (first tokens)]
-    (if (last-token? tokens)
-      (get-node tree t route-params) ; returns the leaf nodes (aka the actions map)
-      (let [[n rp] (get-node tree t route-params)]
-        (find-path (:subroutes n) (rest tokens) rp)))))
+  (let [pt (first tokens) ; path-token
+        [tt n rp] (get-node tree pt route-params)] ; tree-token, node, route-params
+    (println pt tt)
+    (if (or (last-token? tokens) (= tt :*))
+      (get-node tree pt route-params) ; returns the leaf nodes (aka the actions map)
+      (find-path (:subroutes n) (rest tokens) rp))))
 
 ;;; determine which handler to call
 
@@ -102,7 +105,7 @@
   (let [path (:uri request)
         method (:request-method request)
         path-tokens (tokenize-path path)
-        [node route-params] (find-path routes-tree path-tokens {})]
+        [token node route-params] (find-path routes-tree path-tokens {})]
       ; TODO: do surgery here! :any
       [(get node method) route-params])) ; returns [handler route-params]
 
