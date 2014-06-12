@@ -1,6 +1,6 @@
 (ns mx.paths.core
   (:require [mx.paths.utils :refer [combine]]
-            [ring.util.response :refer [resource-response]]
+            [ring.util.response :refer [resource-response file-response]]
             [ring.middleware.content-type :refer [content-type-response]]
             [ring.middleware.not-modified :refer [not-modified-response]]
             [ring.middleware.head :refer [head-response]]))
@@ -9,7 +9,7 @@
   create-routes-tree route
   router-with-def router-with-tree
   bind-query-routes-def bind-query-routes-tree
-  resource-handler)
+  resource-handler file-handler)
 
 ; TODO:
 ; - doesn't support file download yet!
@@ -170,7 +170,7 @@
         (assoc request :params) ; put it back into the request
         (handle h))))) ; call `handle` to execute the handler
 
-;;; resource handling
+;;; resource and file handling
 
 (defn- handle-resource
   "The default resource handler."
@@ -187,6 +187,21 @@
   "Quick helper to be used in resource route definition.
   Add this \"/my-resource-path/:*\" resource-handler to your `paths` definition."
   {:any #'handle-resource})
+
+(defn- handle-file
+  ""
+  [request]
+  (->
+    request
+    (:uri)
+    (file-response)
+    (content-type-response request)
+    (not-modified-response request)
+    (head-response request)))
+
+(def file-handler
+  ""
+  {:any #'handle-file})
 
 ;;; router handler
 
