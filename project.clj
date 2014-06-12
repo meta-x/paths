@@ -1,4 +1,4 @@
-(defproject paths "0.1.0-beta2"
+(defproject paths "0.1.0-beta3"
   :description "(Enhanced) routing library for Clojure/Ring."
   :url "https://github.com/meta-x/paths"
   :license {
@@ -7,6 +7,7 @@
   }
   :dependencies [
     [org.clojure/clojure "1.6.0"]
+    [ring/ring-core "1.3.0"]
   ]
   :deploy-repositories [
     ["clojars" {:sign-releases false}]

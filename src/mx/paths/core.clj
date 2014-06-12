@@ -1,13 +1,18 @@
 (ns mx.paths.core
-  (:require [mx.paths.utils :refer [combine]]))
+  (:require [mx.paths.utils :refer [combine]]
+            [ring.util.response :refer [resource-response]]
+            [ring.middleware.content-type :refer [content-type-response]]
+            [ring.middleware.not-modified :refer [not-modified-response]]
+            [ring.middleware.head :refer [head-response]]))
 
 (declare
   create-routes-tree route
   router-with-def router-with-tree
-  bind-query-routes-def bind-query-routes-tree)
+  bind-query-routes-def bind-query-routes-tree
+  resource-handler)
 
 ; TODO:
-; - doesn't support resources and file download yet!
+; - doesn't support file download yet!
 ; - prune the tree from the delimiter (PATH-DELIMITER-KEEP keeps "/") - implement my own tokenizer code? ugh
 ; - should really implement the feature where I can send the request object with other parameters
 ; - check https://github.com/ztellman/automat for faster tokenization
@@ -164,6 +169,24 @@
         (merge (get request :params {})) ; merge request params with route params
         (assoc request :params) ; put it back into the request
         (handle h))))) ; call `handle` to execute the handler
+
+;;; resource handling
+
+(defn- handle-resource
+  "The default resource handler."
+  [request]
+  (->
+    request
+    (:uri)
+    (resource-response)
+    (content-type-response request)
+    (not-modified-response request)
+    (head-response request)))
+
+(def resource-handler
+  "Quick helper to be used in resource route definition.
+  Add this \"/my-resource-path/:*\" resource-handler to your `paths` definition."
+  {:any #'handle-resource})
 
 ;;; router handler
 
