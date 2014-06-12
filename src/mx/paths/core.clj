@@ -8,7 +8,6 @@
 
 ; TODO:
 ; - doesn't support resources and file download yet!
-; - accept :any "method"
 ; - prune the tree from the delimiter (PATH-DELIMITER-KEEP keeps "/") - implement my own tokenizer code? ugh
 ; - should really implement the feature where I can send the request object with other parameters
 ; - check https://github.com/ztellman/automat for faster tokenization
@@ -92,10 +91,11 @@
 (defn- find-path
   [tree tokens route-params]
   (let [pt (first tokens) ; path-token
-        [tt n rp] (get-node tree pt route-params)] ; tree-token, node, route-params
-    (if (or (last-token? tokens) (= tt :*)) ; if it's the last token or a wildcard token...
-      (get-node tree pt route-params) ; returns the leaf nodes (aka the actions map)
-      (find-path (:subroutes n) (rest tokens) rp)))) ; otherwise keep navigating the tree
+        [tt n rp :as token-node-rp] (get-node tree pt route-params)] ; tree-token, node, route-params
+    (cond
+      (last-token? tokens) token-node-rp ; last token, return [token leaf-node route-params]
+      (= tt :*) [tt n (assoc route-params :* tokens)] ; wildcard token, fix route-params value
+      :else (find-path (:subroutes n) (rest tokens) rp)))) ; otherwise keep navigating the tree
 
 ;;; determine which handler to call
 
