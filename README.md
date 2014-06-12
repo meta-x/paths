@@ -4,7 +4,7 @@
 
 paths is a data-structure based routing library. The goal is to provide an easy to extend routing library for web service development.
 
-ATTN: under development!
+ATTN: under development! things are guaranteed to drastically change!
 
 Please give feedback/suggestions/etc through github issues.
 
@@ -34,7 +34,7 @@ to your leiningen `:dependencies`.
 `paths` expects `ring.middleware.params` and `ring.middleware.keyword-params` to be used as middleware, so be sure to include it. ; TODO: fix this by including these middlewares into paths
 
 ```clojure
-(:require [mx.paths.core :refer [router-with-def]]
+(:require [mx.paths.core :refer [router-with-def resource-handler file-handler]]
           [ring.middleware.params :refer [wrap-params]]
           [ring.middleware.keyword-params :refer [wrap-keyword-params]])
 ```
@@ -42,17 +42,21 @@ to your leiningen `:dependencies`.
 
 
 ### 2.1 Define your routes
-- Route definition consists of a vector that must have a pair of string followed by a map, i.e. `"/path" {:get #'handler$get}`.
+- **Route definition** consists of a vector that must have a pair of string followed by a map, i.e. `"/path" {:get #'handler$get}`.
 
-- In the route definition you only state the paths and the handlers for each method (usually :get/:post/:put/:delete).
+- In the route definition you only state the paths and the handlers for each method (usually `:get`/`:post`/`:put`/`:delete`). `paths` also accepts `:any` (which is only executed as a last alternative).
 
 - Since the 2nd element is a map, it should be easy to extend `paths` i.e. you can add (almost) anything to the the map and (TODO) have it passed to your handler or executed by the routing library.
 
 - You **must** pass the handlers in `var` form, i.e. using `#'`,
 
-- Route definition does not support contextualized routes - they **must be explicitely defined**! This means you need to specify the whole path for routes (i.e. you need to use `/user/sign/in`, `/user/sign/up`, `/user/sign/out` - there's no way to do `/user` and then have the sub-routes `/in`, `/up`, `/out` under the `/user` context). Sorry about that.
+- Route definition does not support contextualized routes - routes **must be explicitely defined**! This means you need to specify the whole path for routes (i.e. you need to use `/user/sign/in`, `/user/sign/up`, `/user/sign/out` - there's no way to do `/user` and then have the sub-routes `/in`, `/up`, `/out` under the `/user` context). Sorry about that.
 
-- For wildcards and route parameters, use the traditional way of defining a path like `/this/path/accepts/:anything/there`. `paths` will put a parameter named `:anything` in the request's `:params` map - which you may optionally obtain by declaring it in the handler's argument list.
+- For **route parameters**, use the traditional way of defining a path like `/this/path/accepts/:anything/there`. `paths` will put a parameter named `:anything` in the request's `:params` map - which you may optionally obtain by declaring it in the handler's argument list.
+
+- For **wildcards**, use the keyword `:*` in your path, i.e. `"/i/accept/anything/:*" {:any #'my-fn}` All requests that get caught by this rule (e.g. `/i/accept/anything/123/456/0000`) will be served the specified handler.
+
+- For **resource and static file handling**, use a wildcard path definition (not strictly required, but it's the common use case) followed by `paths` `resource-handler` or `file-handler` helpers. E.g. `"/public/:*" resource-handler`, `"/download/:*" file-handler`.
 
 Example routes definition:
 ```clojure
