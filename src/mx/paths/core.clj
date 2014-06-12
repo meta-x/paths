@@ -7,9 +7,9 @@
   bind-query-routes-def bind-query-routes-tree)
 
 ; TODO:
-; - prune the tree from the delimiter (PATH-DELIMITER-KEEP keeps "/") - implement my own tokenizer code? ugh
 ; - doesn't support resources and file download yet!
 ; - accept :any "method"
+; - prune the tree from the delimiter (PATH-DELIMITER-KEEP keeps "/") - implement my own tokenizer code? ugh
 ; - should really implement the feature where I can send the request object with other parameters
 ; - check https://github.com/ztellman/automat for faster tokenization
 
@@ -103,7 +103,8 @@
         method (:request-method request)
         path-tokens (tokenize-path path)
         [node route-params] (find-path routes-tree path-tokens {})]
-      [(get node method) route-params))] ; returns [handler route-params]
+      ; TODO: do surgery here! :any
+      [(get node method) route-params])) ; returns [handler route-params]
 
 ;;; determine handler parameters and automagically map them when calling
 
