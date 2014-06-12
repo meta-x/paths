@@ -48,7 +48,7 @@ to your leiningen `:dependencies`.
 
 - Since the 2nd element is a map, it should be easy to extend `paths` i.e. you can add (almost) anything to the the map and (TODO) have it passed to your handler or executed by the routing library.
 
-- You **must** pass the handlers in `var` form, i.e. using `#'`,
+- You **must** pass the handlers in `var` form, i.e. using `#'`.
 
 - Route definition does not support contextualized routes - routes **must be explicitely defined**! This means you need to specify the whole path for routes (i.e. you need to use `/user/sign/in`, `/user/sign/up`, `/user/sign/out` - there's no way to do `/user` and then have the sub-routes `/in`, `/up`, `/out` under the `/user` context). Sorry about that.
 
