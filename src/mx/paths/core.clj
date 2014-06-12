@@ -12,10 +12,11 @@
 ; - prune the tree from the delimiter (PATH-DELIMITER-KEEP keeps "/") - implement my own tokenizer code? ugh
 ; - should really implement the feature where I can send the request object with other parameters
 ; - check https://github.com/ztellman/automat for faster tokenization
-; - create atom for "request"
 
 (def PATH-DELIMITER-KEEP #"((?<=/)|(?=/))")
 (def PATH-DELIMITER-DISCARD #"/")
+
+(def request-obj "request")
 
 (defn- tokenize-path
   "Given /this/is/a/path, returns [/ this / is / a / path].
@@ -92,10 +93,9 @@
   [tree tokens route-params]
   (let [pt (first tokens) ; path-token
         [tt n rp] (get-node tree pt route-params)] ; tree-token, node, route-params
-    (println pt tt)
-    (if (or (last-token? tokens) (= tt :*))
+    (if (or (last-token? tokens) (= tt :*)) ; if it's the last token or a wildcard token...
       (get-node tree pt route-params) ; returns the leaf nodes (aka the actions map)
-      (find-path (:subroutes n) (rest tokens) rp))))
+      (find-path (:subroutes n) (rest tokens) rp)))) ; otherwise keep navigating the tree
 
 ;;; determine which handler to call
 
@@ -106,8 +106,7 @@
         method (:request-method request)
         path-tokens (tokenize-path path)
         [token node route-params] (find-path routes-tree path-tokens {})]
-      ; TODO: do surgery here! :any
-      [(get node method) route-params])) ; returns [handler route-params]
+      [(or (get node method) (get node :any)) route-params])) ; returns [handler route-params]
 
 ;;; determine handler parameters and automagically map them when calling
 
@@ -141,8 +140,7 @@
     (cond
       (= num-params 0) ; no args handler
         (handler)
-      ; TODO: cleanup "request"
-      (and (= num-params 1) (some #{(symbol "request")} param-names)) ; handler expects the http request
+      (and (= num-params 1) (some #{(symbol request-obj)} param-names)) ; handler expects the http request
         (apply handler [request])
       :else ; handler defined a list of arguments
         (let [req-params (:params request)
