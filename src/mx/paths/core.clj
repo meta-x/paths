@@ -11,12 +11,6 @@
   bind-query-routes-def bind-query-routes-tree
   resource-handler file-handler)
 
-; TODO:
-; - prune the tree from the delimiter (PATH-DELIMITER-KEEP keeps "/") - implement my own tokenizer code? ugh
-; - should really implement the feature where I can send the request object with other parameters
-; - check https://github.com/ztellman/automat for faster tokenization
-; - include required middlewares into paths...
-
 (def PATH-DELIMITER-KEEP #"((?<=/)|(?=/))")
 (def PATH-DELIMITER-DISCARD #"/")
 
