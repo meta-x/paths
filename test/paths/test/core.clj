@@ -5,20 +5,6 @@
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
   ))
 
-; TODO: add this to paths
-; https://github.com/weavejester/compojure/blob/master/src/compojure/handler.clj
-(defn pathsize [app]
-  (-> app
-      (wrap-keyword-params)
-      (wrap-params)
-  ))
-
-
-
-
-
-
-
 ; no args handlers
 (defn na-get []
   :na-get)

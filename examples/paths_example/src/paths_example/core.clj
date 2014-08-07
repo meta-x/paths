@@ -63,6 +63,11 @@
   (response (str "you-put-me" "\n" param)))
 
 
+(defn hello-world []
+  (response "Hello World"))
+
+(defn hi-world []
+  (response "Hi World"))
 
 (def routes [
   "/" {:get #'index}
@@ -71,6 +76,8 @@
   "/with/no/args" {:get #'handler-with-no-args}
   "/this/accepts/:wildcards/yeah" {:get #'handler-wildcard}
   "/this/is/an/endpoint" {:get #'handler-get :delete #'handler-delete :post #'handler-post :put #'handler-put}
+  "/test/:hello/world" {:get #'hello-world}
+  "/test/:hi/world" {:get #'hi-world}
 ])
 
 (def app
