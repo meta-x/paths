@@ -1,59 +1,41 @@
 (ns paths.test.core
   (:require [clojure.test :refer [deftest testing is use-fixtures]]
             [mx.paths.core :refer :all]
-            [ring.middleware.params :refer [wrap-params]]
-            [ring.middleware.keyword-params :refer [wrap-keyword-params]]
+            [mx.paths.tree :refer :all]
+            [mx.paths.matcher :refer :all]
+            [mx.paths.dispatcher :refer :all]
+            [mx.paths.handlers :refer :all]
   ))
 
 ; no args handlers
-(defn na-get []
-  :na-get)
-(defn na-post []
-  :na-post)
-(defn na-put []
-  :na-put)
-(defn na-delete []
-  :na-delete)
+(defn na-get [] :na-get)
+(defn na-post [] :na-post)
+(defn na-put [] :na-put)
+(defn na-delete [] :na-delete)
 
 ; "normal" params handlers
-(defn wnp-get [arg1 arg2]
-  {:wnp-get {:arg1 arg1 :arg2 arg2}})
-(defn wnp-post [arg1 arg2]
-  {:wnp-post {:arg1 arg1 :arg2 arg2}})
-(defn wnp-put [arg1 arg2]
-  {:wnp-put {:arg1 arg1 :arg2 arg2}})
-(defn wnp-delete [arg1 arg2]
-  {:wnp-delete {:arg1 arg1 :arg2 arg2}})
+(defn wnp-get [arg1 arg2] {:wnp-get {:arg1 arg1 :arg2 arg2}})
+(defn wnp-post [arg1 arg2] {:wnp-post {:arg1 arg1 :arg2 arg2}})
+(defn wnp-put [arg1 arg2] {:wnp-put {:arg1 arg1 :arg2 arg2}})
+(defn wnp-delete [arg1 arg2] {:wnp-delete {:arg1 arg1 :arg2 arg2}})
 
 ; route params handlers
-(defn wrp-get [arg1 arg2]
-  {:wrp-get {:arg1 arg1 :arg2 arg2}})
-(defn wrp-post [arg1 arg2]
-  {:wrp-post {:arg1 arg1 :arg2 arg2}})
-(defn wrp-put [arg1 arg2]
-  {:wrp-put {:arg1 arg1 :arg2 arg2}})
-(defn wrp-delete [arg1 arg2]
-  {:wrp-delete {:arg1 arg1 :arg2 arg2}})
+(defn wrp-get [arg1 arg2] {:wrp-get {:arg1 arg1 :arg2 arg2}})
+(defn wrp-post [arg1 arg2] {:wrp-post {:arg1 arg1 :arg2 arg2}})
+(defn wrp-put [arg1 arg2] {:wrp-put {:arg1 arg1 :arg2 arg2}})
+(defn wrp-delete [arg1 arg2] {:wrp-delete {:arg1 arg1 :arg2 arg2}})
 
 ; request object param handlers
-(defn wrop-get [request]
-  {:wrop-get {:arg request}})
-(defn wrop-post [request]
-  {:wrop-post {:arg request}})
-(defn wrop-put [request]
-  {:wrop-put {:arg request}})
-(defn wrop-delete [request]
-  {:wrop-delete {:arg request}})
+(defn wrop-get [request] {:wrop-get {:arg request}})
+(defn wrop-post [request] {:wrop-post {:arg request}})
+(defn wrop-put [request] {:wrop-put {:arg request}})
+(defn wrop-delete [request] {:wrop-delete {:arg request}})
 
 ; wildcard route handlers
-(defn wwr-get [arg]
-  {:wwr-get {:arg arg}})
-(defn wwr-post [arg]
-  {:wwr-post {:arg arg}})
-(defn wwr-put [arg]
-  {:wwr-put {:arg arg}})
-(defn wwr-delete [arg]
-  {:wwr-delete {:arg arg}})
+(defn wwr-get [arg] {:wwr-get {:arg arg}})
+(defn wwr-post [arg] {:wwr-post {:arg arg}})
+(defn wwr-put [arg] {:wwr-put {:arg arg}})
+(defn wwr-delete [arg] {:wwr-delete {:arg arg}})
 
 (def routes [
   "/no/args" {:get #'na-get :post #'na-post :put #'na-put :delete #'na-delete}
@@ -62,6 +44,9 @@
   "/with/request/object/param" {:get #'wrop-get :post #'wrop-post :put #'wrop-put :delete #'wrop-delete}
   "/with/i-am-a-route-param/wildcard/:*" {:get #'wwr-get :post #'wwr-post :put #'wwr-put :delete #'wwr-delete}
 ])
+
+; TODO: use pathsize
+; TODO: use wrap-middleware
 (def app
   (->
     routes
@@ -138,3 +123,78 @@
   ; TODO: test the cases where the parameters are missing
 
 )
+
+
+
+
+
+
+
+
+
+
+
+; (require '[mx.paths.tree :as t] :reload-all)
+; (require '[mx.paths.dispatcher :as d] :reload-all)
+; (require '[mx.paths.matcher :as m] :reload-all)
+
+; (defn x1 []
+;   (println "slash"))
+; (defn four []
+;   (println "404!"))
+
+; (def routes [
+;   "/" {:get #'x1}
+; ])
+
+; (def rt (t/create-routes-tree routes))
+; (d/dispatch rt {:uri "/" :request-method :get})
+; (d/dispatch rt {:uri "/abc" :request-method :get})
+
+
+
+; TODO: mx.paths.dispatcher/handle
+; NOTE2: also, maybe support sending(?) metadata AND params? or is that too much hassle...?
+
+
+
+; -----------------------------------------------------------------------------
+
+
+
+; tree.clj
+; (def routes-def [ ... ])
+; (create-routes-tree routes-def)
+; assert that the tree is as expected
+
+
+
+; matcher.clj
+; (def request {...})
+; (match routes-tree request)
+
+
+
+; dispatcher.clj
+; (dispatch routes-tree request)
+
+
+
+; middleware.clj
+; (wrap-route-params handler routes-tree)
+
+
+
+; core.clj
+; (route routes-def)
+; (route routes-tree)
+; (query routes-def)
+; (query routes-tree)
+; (pathsize routes-def)
+; (pathsize routes-tree)
+; (wrap-middleware app routes-tree)
+
+
+
+
+

@@ -7,7 +7,7 @@
   "Middleware that puts the route parameters into the request's :params map."
   [handler routes-tree]
   (fn [request]
-    (let [[_ route-params] (match request routes-tree)]
+    (let [[_ route-params] (match routes-tree request)]
       (->>
         route-params
         (merge (get request :params {})) ; merge request params with route params

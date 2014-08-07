@@ -46,7 +46,7 @@
 
 (defn match
   "Match the request to the correct handler and returns it and its route parameters."
-  [request routes-tree] ; public visibility
+  [routes-tree request] ; public visibility
   (let [path (:uri request)
         method (:request-method request)
         path-tokens (tokenize-path path)

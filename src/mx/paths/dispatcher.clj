@@ -38,13 +38,13 @@
 
 (defn dispatch
   [routes-tree request]
-  (let [[h rp] (match request routes-tree)]
+  (let [[h rp] (match routes-tree request)]
     (if (nil? h)
       ; no handler found, 404
       (let [handler-404 (:any (get routes-tree ":404" fourzerofour-handler))]
         (handler-404 request))
       ; handler found, apply handler with args
-      (->> ; TODO: if wrap-route-params is used, this is not needed
+      (->>
         rp ; route params
         (merge (get request :params {})) ; merge request params with route params
         (assoc request :params) ; put it back into the request

@@ -24,12 +24,12 @@
   ; query returns a function that let's you query the routes tree.
   ; this version takes a precompiled routes-tree as argument.
   (fn [request]
-    (match request routes-tree)))
+    (match routes-tree request)))
 (defmethod query false [routes-def]
   ; query returns a function that let's you query the routes tree.
   ; this version takes the routes definition as argument.
   (fn [request]
-    (match request (create-routes-tree routes-def))))
+    (match (create-routes-tree routes-def) request)))
 
 
 (defn pathsize

@@ -32,7 +32,7 @@
 (defn create-routes-tree
   "Given a routes definition, returns a routes tree that is used by the routing
   function to send requests to the correct handler."
-  [routes-def] ; public visibility
+  [routes-def]
   (loop [[path actions :as r] routes-def
          tree {}]
     (if path
