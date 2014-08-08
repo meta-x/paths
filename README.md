@@ -2,7 +2,7 @@
 
 A routing library for Clojure/Ring.
 
-paths is a data-structure based routing library. The goal is to provide an easy to extend routing library for web service development.
+`paths` is a data-structure based routing library. The goal is to provide an easy to extend routing library for web service development.
 
 Please give feedback/suggestions/etc through github issues.
 
@@ -28,11 +28,23 @@ to your leiningen `:dependencies`.
 
 ## Usage
 
-TLDR: require `[mx.paths.core :refer [pathsize]]`, declare your routes `(def routes ["/something" {:get #'somethings-handler}])`, implement the handler `(defn somethings-handler [arg1 arg2] {:body (str "look mah, no hands! and with " arg1 " and " arg2)})`, paths-ize your ring app `(def app (pathsize routes))` and you're ready to serve (`lein ring server-headless`) and visit http://localhost:3000/something?arg1=left&arg2=right !
+TL;DR
+
+require `[mx.paths.core :refer [pathsize]]`,
+
+declare your routes `(def routes ["/something" {:get #'somethings-handler}])`,
+
+implement the handler `(defn somethings-handler [arg1 arg2] {:body (str "look mah, no hands! and with " arg1 " and " arg2)})`,
+
+paths-ize your ring app `(def app (pathsize routes))`
+
+and you're ready to serve (`lein ring server-headless`)
+
+and visit [this link](http://localhost:3000/something?arg1=left&arg2=right)!
 
 Read on if you want to learn about the details.
 
-### 1 Define your routes
+### 1. Define your routes
 **Route definition** consists of a vector that must have a pair of string followed by a map, i.e.
 
 ```clojure
@@ -61,7 +73,7 @@ Read on if you want to learn about the details.
 
 
 
-### 2 Implement your handlers
+### 2. Implement your handlers
 Handlers in `paths` are simple functions (i.e. defined through `defn`). They can have any number of arguments (0+).
 
 Some examples of handler implementations:
