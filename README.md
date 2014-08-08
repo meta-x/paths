@@ -31,15 +31,10 @@ to your leiningen `:dependencies`.
 TL;DR
 
 require `[mx.paths.core :refer [pathsize]]`,
-
 declare your routes `(def routes ["/something" {:get #'somethings-handler}])`,
-
 implement the handler `(defn somethings-handler [arg1 arg2] {:body (str "look mah, no hands! and with " arg1 " and " arg2)})`,
-
 paths-ize your ring app `(def app (pathsize routes))`
-
 and you're ready to serve (`lein ring server-headless`)
-
 and visit [this link](http://localhost:3000/something?arg1=left&arg2=right)!
 
 Read on if you want to learn about the details.
