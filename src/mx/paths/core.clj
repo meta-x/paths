@@ -32,16 +32,19 @@
     (match (create-routes-tree routes-def) request)))
 
 
-(defn pathsize
-  "Helper... to be used when there's no middleware dependencies on the params middlewares"
-  [routes]
+
+; Helper... to be used when there's no middleware dependencies on the params middlewares
+(defmulti pathsize map?)
+(defmethod pathsize true [routes-tree]
   (->
-    routes  ; doesn't matter if it's a tree or the definition
-    (route) ; the multimethod will find the correct one
-    (wrap-route-params)
+    routes-tree
+    (route)
+    (wrap-route-params routes-tree)
     (wrap-keyword-params)
-    (wrap-params)
-    ))
+    (wrap-params)))
+(defmethod pathsize false [routes-def]
+  (pathsize (create-routes-tree routes-def)))
+
 
 (defn wrap-middleware
   "Helper ... to be used when there's dependencies on the params middlewares"

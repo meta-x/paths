@@ -44,6 +44,5 @@
   {:status 404 :body "Ooops..."})
 
 (def fourzerofour-handler
-  "Quick helper to be used in 404 route definition.
-  Add this :404 fourzerofour-handler to your `paths` definition."
+  "Quick helper to be used in 404 route definition. Calls default 404 handler."
   {:any #'handle-404})

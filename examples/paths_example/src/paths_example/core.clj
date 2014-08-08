@@ -1,8 +1,5 @@
 (ns paths-example.core
-  (:require [mx.paths.core :refer [router-with-def]]
-            [ring.adapter.jetty :refer [run-jetty]]
-            [ring.middleware.params :refer [wrap-params]]
-            [ring.middleware.keyword-params :refer [wrap-keyword-params]]
+  (:require [mx.paths.core :refer [pathsize]]
             [ring.util.response :refer [response]])
   )
 
@@ -81,8 +78,4 @@
 ])
 
 (def app
-  (->
-    routes
-    (router-with-def)
-    (wrap-keyword-params)
-    (wrap-params)))
+  (pathsize routes))

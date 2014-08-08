@@ -2,7 +2,6 @@
   (:require [mx.paths.utils :refer [combine]]))
 
 (def PATH-DELIMITER-KEEP #"((?<=/)|(?=/))")
-(def PATH-DELIMITER-DISCARD #"/")
 
 (defn tokenize-path
   "Given \"/this/is/a/path\", returns [/ this / is / a / path]."

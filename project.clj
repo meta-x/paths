@@ -1,4 +1,4 @@
-(defproject paths "0.1.0-beta4"
+(defproject paths "0.1.0"
   :description "(Enhanced) routing library for Clojure/Ring."
   :url "https://github.com/meta-x/paths"
   :license {

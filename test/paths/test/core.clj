@@ -45,13 +45,12 @@
   "/with/i-am-a-route-param/wildcard/:*" {:get #'wwr-get :post #'wwr-post :put #'wwr-put :delete #'wwr-delete}
 ])
 
-; TODO: use pathsize
-; TODO: use wrap-middleware
+; TODO: test plain (doesn't add new keys to the request)
+; TODO: test with pathsize
+; TODO: test with wrap-middleware
+
 (def app
-  (->
-    routes
-    (router-with-def)
-  ))
+  (route routes))
 
 
 
