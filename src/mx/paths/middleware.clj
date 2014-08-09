@@ -12,5 +12,5 @@
         route-params
         (merge (get request :params {})) ; merge request params with route params
         (assoc request :params) ; put it back into the request
-        (handler) ; TODO: huh.. I need to call the next handler...
+        (handler) ; and call the next handler...
       ))))
