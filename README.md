@@ -131,13 +131,14 @@ And now just serve your app!
 
 
 
-### 4. `paths` structure
-`paths` supports a few more modes of operations. To explain that, we should look into how things are structured.
+### 4. `paths` internals
 
 This is how `paths` works
 ![How paths works](/doc/how-paths-works.jpg?raw=true)
 
 The source is the routes definition vector. It is transformed into a routes tree. This tree is queried every time a request comes in. A handler is matched through the request and then dispatched (i.e. executed) with the correct arguments.
+
+Let us look into how things are structured.
 
 #### `mx.paths.tree`
 This module contains the functions that build a routes tree from a routes definition, namely `create-routes-tree`. There might be an ocasion where you'll want to use this function to create a routes tree and keep a reference to it.
