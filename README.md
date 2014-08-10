@@ -160,7 +160,7 @@ This module contains 3 different sets of functions.
 
 `query` is a wrapper around `match`. It is intended to be used in your Ring app definition. It allows you to integrate `paths` with other libraries (e.g. [enforcer](https://github.com/meta-x/enforcer)) or code that might need to consult the routes tree in runtime.
 
-Even though `route` and `query` can both take either a routes definition or a routes tree as argument, the general use case is for you to build a routes tree beforehand with `mx.paths.tree/create-routes-tree` and pass it to these functions.
+Even though `route` and `query` can both take either a routes definition or a routes tree as argument, when using `query`, the general use case is for you to build a routes tree beforehand with `mx.paths.tree/create-routes-tree`, keep a reference to it and then pass it to these functions.
 
 `pathsize` and `wrap-middleware` are app definition helpers. `pathsize` is useful when you don't have any other middleware that is dependent on `wrap-keyword-params` or `wrap-params`. `wrap-middleware` simply bundles these middleware for you.
 
