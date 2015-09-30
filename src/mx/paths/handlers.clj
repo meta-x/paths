@@ -6,7 +6,7 @@
 
 ;;; resource and file handling
 
-(defn- handle-resource
+(defn handle-resource
   "The default handler for resource requests."
   [request]
   (->
@@ -20,9 +20,9 @@
 (def resource-handler
   "Quick helper to be used in resource route definition.
   Add this \"/my-resource-path/:*\" resource-handler to your `paths` definition."
-  {:any #'handle-resource})
+  {:get #'handle-resource})
 
-(defn- handle-file
+(defn handle-file
   "The default handler for static file requests."
   [request]
   (->
@@ -36,9 +36,9 @@
 (def file-handler
   "Quick helper to be used in static file route definition.
   Add this \"/my-file-path/:*\" file-handler to your `paths` definition."
-  {:any #'handle-file})
+  {:get #'handle-file})
 
-(defn- handle-404
+(defn handle-404
   "The default 404 response."
   [request]
   {:status 404 :body "Ooops..."})

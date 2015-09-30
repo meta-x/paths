@@ -4,7 +4,7 @@ A routing library for Clojure/Ring.
 
 `paths` is a data-structure based routing library. The goal is to provide an easy to extend routing library for web service development.
 
-Please give feedback/suggestions/etc through github issues.
+Yes, this is usable. Feedback, suggestions, etc are welcome.
 
 
 
@@ -57,7 +57,7 @@ Read on if you want to learn about the details.
   "/this/is/an/endpoint" {:get #'handler-get :delete #'handler-delete :post #'handler-post :put #'handler-put}
 ])
 ```
-- In the route definition you state the route and the handlers for each HTTP method (usually `:get`/`:post`/`:put`/`:delete`). `paths` also accepts `:any` (which is only executed as a last alternative).
+- In the route definition you state the route and the handlers for each HTTP method (usually `:get`/`:post`/`:put`/`:delete`). `paths` also accepts `:any` (which is only executed as a last resort).
 
 - You **must** pass the handlers in `var` form, i.e. using `#'`.
 
@@ -67,7 +67,7 @@ Read on if you want to learn about the details.
 
 - For **resource and static file handling**, require `mx.paths.handlers`, add a wildcard route definition followed by `paths`'s `resource-handler` or `file-handler` helpers. E.g. `"/public/:*" resource-handler`, `"/download/:*" file-handler`. Resources are expected to be in your project's `/resources` folder. Static files should be placed under `/resources/public`.
 
-- To define your own handling of 404 not found, add a `:404` route with an `:any`, e.g. `:404 {:any #'my-404-handler}`. Your 404 handler should take a single `request` parameter.
+- To define your own handling of 404 not found, add a `:404` route with an `:any`, e.g. `:404 {:any #'my-404-handler}`. Your 404 handler should take a single `request` parameter `(defn my-404-handler [request] ...)`.
 
 - Route definition does not support contextualized routes - routes **must be explicitely defined**! This means you need to specify the whole path to the route (i.e. you need to use `/user/sign/in`, `/user/sign/up`, `/user/sign/out` - there's no way to do `/user` and then have the sub-routes `/in`, `/up`, `/out` under the `/user` context). Sorry about that.
 
@@ -99,9 +99,9 @@ Some examples of handler implementations:
   (response wildcards))
 ```
 
-- When the handler is being dispatched by `paths`, the arguments will be mapped from the request object's `:params` map.
+- When the handler is being dispatched by `paths`, the arguments will be mapped from the request object's `:params` map (this means paths requires some middlewares to be present, more on this later).
 
-- You can also send the whole request object into your handler by having a parameter named request.
+- You can also send the whole request object into your handler by having a parameter named `request`.
 
 - Say you want to have a parameter with a different name in your handler. You can rename it by adding the `:name` key as metadata. The value of this key is the name of the expected parameter in the request object. (e.g. `(defn my-handler [^{:name "name-in-request"} nir] ...)`
 
